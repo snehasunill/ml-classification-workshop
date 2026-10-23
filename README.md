@@ -39,21 +39,23 @@ With injected label noise in the separate complexity experiment, the unlimited-d
 
 On **33 held-out small dogs**, dog-class recall changes from **9.1%** (3/33) when small dogs are excluded from training to **66.7%** (22/33) when they are included. The evaluation group is identical for both conditions. Removing a subgroup also changes training-set size/class balance, so this is a *representation-gap demonstration*, not a controlled estimate of one isolated causal factor.
 
-### Technical Interpretation & Discussion
-Model selection:
-The k-NN classifier achieved the highest mean cross-validation F1 score, but the differences between models were small and don't establish statistical superiority.
+## Technical Interpretation & Discussion
 
-Feature scaling and leakage:
-k-NN uses distances, so numerical scale matters. Scaling inside a pipeline prevents preprocessing leakage across CV folds.
+### Model selection
+The k-NN classifier achieved the highest mean cross-validation F1 score, but the differences between k-NN, logistic regression, and decision trees were small. These results do not establish that k-NN is statistically superior. Model selection was based on cross-validation performance rather than test-set results.
 
-Overfitting and generalization:
-More complex trees achieved higher training accuracy while eventually performing worse on validation data.
+### Feature scaling and leakage
+k-NN uses distances between observations, so features with larger numerical scales can disproportionately influence predictions. StandardScaler was placed inside a scikit-learn Pipeline so scaling parameters are learned only from the training portion of each cross-validation fold, avoiding preprocessing leakage.
 
-Dataset representation:
-Missing small-dog examples reduced subgroup performance, although the experiment doesn't isolate causation.
+### Overfitting and generalization
+Increasing decision-tree complexity raised training accuracy while eventually reducing validation accuracy. This growing generalization gap suggests that the deeper trees were fitting noise rather than learning patterns that generalize to unseen observations.
 
-Limitations:
-Synthetic data illustrates ML fundamentals but does not establish real-world classification performance.
+### Dataset representation
+Models trained without small-dog examples performed poorly on that subgroup. Including those examples improved coverage, but this demonstration does not independently establish a causal effect because the training sets differ in composition and size.
+
+### Limitations
+All observations are synthetic, with only two numerical features. The findings demonstrate fundamental ML concepts but should not be interpreted as evidence of performance on real-world animal classification tasks.
+
 
 ## Run locally
 

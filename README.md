@@ -1,5 +1,8 @@
 # From Examples to Generalization: An ML Classification Case Study
 
+[![ML Pipeline Tests](https://github.com/snehasunill/ml-classification-workshop/actions/workflows/ml-tests.yml/badge.svg)](https://github.com/snehasunill/ml-classification-workshop/actions/workflows/ml-tests.yml)
+
+
 A reproducible **supervised machine learning case study** and a companion, simplified educational demo. The technical study compares classifiers, tunes hyperparameters using cross-validation, diagnoses overfitting, and examines how incomplete training coverage affects a subgroup. The teaching demo translates the same concepts for a Grades 6–9 audience.
 
 > **Scope:** All pet data are synthetic and deliberately simplistic. The results demonstrate methodology, not real animal recognition or a real-world fairness audit. This is a personal prototype, not an official GIRLsmarts4tech resource.
@@ -16,18 +19,42 @@ A reproducible **supervised machine learning case study** and a companion, simpl
 | Representation gaps | Train with vs. without small dogs, evaluate against the same held-out subgroup | Reveals how training coverage can change subgroup recall |
 | Reproducibility | Fixed seeds, automated tests, JSON output, saved diagnostic figure | Makes findings inspectable rather than relying on screenshot claims |
 
-## Results from the default synthetic dataset
 
-Training: **720 samples**; untouched test: **180 samples**. Five-fold CV occurs inside the training split.
+## Experimental Results
+### Model comparison using cross-validation
 
-| Model | Mean CV dog-class F1 | Held-out dog-class F1 |
+The dataset contains 900 synthetic observations, split into 720 training and 180 held-out test examples. Hyperparameter tuning and model selection use stratified 5-fold cross-validation on the training partition only.
+
+| Model | Best mean CV dog-class F1 |
+|---|---:|
+| Majority-class baseline | 0.000 |
+| Logistic regression | 0.935 |
+| k-NN | **0.939** |
+| Decision tree | 0.936 |
+
+k-NN was selected based on the highest mean cross-validation F1 score, with `n_neighbors=11`.
+
+### Final held-out test evaluation
+
+Only the CV-selected benchmark model is evaluated on the held-out test set.
+
+| Metric | Selected k-NN |
+|---|---:|
+| Accuracy | 93.3% |
+| Dog-class precision | 100% |
+| Dog-class recall | 86.7% |
+| Dog-class F1 | 0.929 |
+| Balanced accuracy | 93.3% |
+
+The confusion matrix (rows = actual, columns = predicted; class order: cat, dog) is:
+
+| | Predicted cat | Predicted dog |
 |---|---:|---:|
-| Majority baseline | 0.000 | 0.000 |
-| Logistic regression | 0.935 | 0.929 |
-| k-NN | **0.939** | **0.929** |
-| Decision tree | 0.936 | 0.916 |
+| Actual cat | 90 | 0 |
+| Actual dog | 12 | 78 |
 
-**Selected using training-only CV:** k-NN (`n_neighbors=11`). Held-out test accuracy: **93.3%**, dog-class recall **86.7%** (78 of 90 dogs recognized). The model correctly classified all 90 cats, but mislabeled 12 dogs as cats. This illustrates why accuracy alone is incomplete.
+Although overall accuracy is high, the classifier misses 12 of 90 dogs. This demonstrates why class-specific metrics are important alongside accuracy.
+
 
 ### Overfitting diagnostic
 
@@ -39,22 +66,37 @@ With injected label noise in the separate complexity experiment, the unlimited-d
 
 On **33 held-out small dogs**, dog-class recall changes from **9.1%** (3/33) when small dogs are excluded from training to **66.7%** (22/33) when they are included. The evaluation group is identical for both conditions. Removing a subgroup also changes training-set size/class balance, so this is a *representation-gap demonstration*, not a controlled estimate of one isolated causal factor.
 
+
 ## Technical Interpretation & Discussion
 
-### Model selection
-The k-NN classifier achieved the highest mean cross-validation F1 score, but the differences between k-NN, logistic regression, and decision trees were small. These results do not establish that k-NN is statistically superior. Model selection was based on cross-validation performance rather than test-set results.
+### Model selection and uncertainty
 
-### Feature scaling and leakage
-k-NN uses distances between observations, so features with larger numerical scales can disproportionately influence predictions. StandardScaler was placed inside a scikit-learn Pipeline so scaling parameters are learned only from the training portion of each cross-validation fold, avoiding preprocessing leakage.
+k-NN achieved the highest mean CV F1 (0.939), but logistic regression (0.935) and decision trees (0.936) performed similarly. These small differences do not establish statistical superiority.
 
-### Overfitting and generalization
-Increasing decision-tree complexity raised training accuracy while eventually reducing validation accuracy. This growing generalization gap suggests that the deeper trees were fitting noise rather than learning patterns that generalize to unseen observations.
+The selected model is the winner under the specified cross-validation procedure, not necessarily the best model across other datasets or random splits. Repeated cross-validation could help assess how stable the rankings are.
 
-### Dataset representation
-Models trained without small-dog examples performed poorly on that subgroup. Including those examples improved coverage, but this demonstration does not independently establish a causal effect because the training sets differ in composition and size.
+### Why feature scaling matters
+
+k-NN classifies observations based on distances between feature vectors. Without scaling, a feature with a larger numerical range may dominate distance calculations.
+
+StandardScaler is included inside a scikit-learn Pipeline, ensuring the scaler is fitted separately on each CV training fold. This prevents information from validation folds leaking into preprocessing.
+
+### Overfitting and the bias-variance tradeoff
+
+As decision-tree depth increases, training accuracy improves while validation accuracy eventually declines. In the noise-injected experiment, the unrestricted tree reaches 100% training accuracy but only 72.2% CV accuracy.
+
+This growing generalization gap is evidence of overfitting: the tree increasingly fits training-specific patterns that do not generalize well.
+
+### Training-data representation
+
+Excluding small dogs from training reduces their held-out recall from 66.7% to 9.1%. This illustrates how incomplete training coverage can disproportionately affect a subgroup.
+
+However, excluding small dogs also changes the training-set size and class distribution. Therefore, the experiment cannot isolate subgroup coverage as the sole causal explanation.
 
 ### Limitations
-All observations are synthetic, with only two numerical features. The findings demonstrate fundamental ML concepts but should not be interpreted as evidence of performance on real-world animal classification tasks.
+
+The dataset is synthetic and contains only two numerical features. The conclusions demonstrate ML methodology rather than real-world animal classification performance. Further analysis could include repeated CV, learning curves, uncertainty estimates, and controlled subgroup ablations.
+
 
 
 ## Run locally
@@ -70,7 +112,24 @@ python ml_experiments.py
 python -m pytest -q
 ```
 
-Outputs: `reports/results.json` and `reports/tree_complexity.png`. Re-running overwrites these reproducible reports.
+
+### Reproducible experiment reports
+
+Running `python ml_experiments.py` generates:
+
+- `reports/results.json` — Model comparison, final selected-model evaluation, complexity diagnostics, and subgroup results.
+- `reports/tree_complexity.png` — Training versus cross-validation accuracy across decision-tree depths.
+
+GitHub Actions automatically runs the test suite and experiments on every push.
+
+To inspect the latest generated reports without running the project locally:
+
+1. Open the repository's **Actions** tab.
+2. Select the latest successful **ML Pipeline Tests** run.
+3. Download the `ml-experiment-reports` artifact from the **Artifacts** section.
+
+The committed report files may reflect an earlier run; workflow artifacts contain the results generated by their corresponding CI execution.
+
 
 For the short student-facing activity, run:
 

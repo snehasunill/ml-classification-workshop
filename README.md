@@ -39,6 +39,9 @@ With injected label noise in the separate complexity experiment, the unlimited-d
 
 On **33 held-out small dogs**, dog-class recall changes from **9.1%** (3/33) when small dogs are excluded from training to **66.7%** (22/33) when they are included. The evaluation group is identical for both conditions. Removing a subgroup also changes training-set size/class balance, so this is a *representation-gap demonstration*, not a controlled estimate of one isolated causal factor.
 
+### Technical Interpretation & Discussion
+...
+
 ## Run locally
 
 Python 3.10+ recommended. Use a virtual environment.

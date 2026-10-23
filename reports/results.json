@@ -1,0 +1,152 @@
+{
+  "dataset": {
+    "synthetic": true,
+    "n_train": 720,
+    "n_test": 180,
+    "features": [
+      "weight_kg",
+      "ear_length_cm"
+    ],
+    "seed": 42
+  },
+  "model_comparison": {
+    "dummy_majority": {
+      "cv_f1_mean": 0.0,
+      "best_params": {},
+      "test": {
+        "accuracy": 0.5,
+        "balanced_accuracy": 0.5,
+        "precision_dog": 0.0,
+        "recall_dog": 0.0,
+        "f1_dog": 0.0
+      }
+    },
+    "logistic_regression": {
+      "cv_f1_mean": 0.9348,
+      "best_params": {
+        "clf__C": 10
+      },
+      "test": {
+        "accuracy": 0.9333,
+        "balanced_accuracy": 0.9333,
+        "precision_dog": 1.0,
+        "recall_dog": 0.8667,
+        "f1_dog": 0.9286
+      }
+    },
+    "knn": {
+      "cv_f1_mean": 0.9386,
+      "best_params": {
+        "clf__n_neighbors": 11
+      },
+      "test": {
+        "accuracy": 0.9333,
+        "balanced_accuracy": 0.9333,
+        "precision_dog": 1.0,
+        "recall_dog": 0.8667,
+        "f1_dog": 0.9286
+      }
+    },
+    "decision_tree": {
+      "cv_f1_mean": 0.9359,
+      "best_params": {
+        "max_depth": 3,
+        "min_samples_leaf": 1
+      },
+      "test": {
+        "accuracy": 0.9222,
+        "balanced_accuracy": 0.9222,
+        "precision_dog": 1.0,
+        "recall_dog": 0.8444,
+        "f1_dog": 0.9157
+      }
+    },
+    "_selection": {
+      "selected_using_training_cv": "knn",
+      "test_confusion_matrix_labels": [
+        "cat",
+        "dog"
+      ],
+      "test_confusion_matrix": [
+        [
+          90,
+          0
+        ],
+        [
+          12,
+          78
+        ]
+      ]
+    }
+  },
+  "complexity": [
+    {
+      "max_depth": 1,
+      "train_accuracy": 0.8278,
+      "cv_accuracy": 0.8278
+    },
+    {
+      "max_depth": 2,
+      "train_accuracy": 0.8358,
+      "cv_accuracy": 0.8264
+    },
+    {
+      "max_depth": 3,
+      "train_accuracy": 0.8451,
+      "cv_accuracy": 0.8194
+    },
+    {
+      "max_depth": 5,
+      "train_accuracy": 0.8691,
+      "cv_accuracy": 0.8042
+    },
+    {
+      "max_depth": 10,
+      "train_accuracy": 0.9517,
+      "cv_accuracy": 0.7542
+    },
+    {
+      "max_depth": "unlimited",
+      "train_accuracy": 1.0,
+      "cv_accuracy": 0.7222
+    }
+  ],
+  "representation": [
+    {
+      "training_condition": "small_dogs_excluded",
+      "dog_size": "small",
+      "n_test": 33,
+      "recall_dog": 0.0909
+    },
+    {
+      "training_condition": "small_dogs_excluded",
+      "dog_size": "medium",
+      "n_test": 37,
+      "recall_dog": 1.0
+    },
+    {
+      "training_condition": "small_dogs_excluded",
+      "dog_size": "large",
+      "n_test": 20,
+      "recall_dog": 1.0
+    },
+    {
+      "training_condition": "full_training_data",
+      "dog_size": "small",
+      "n_test": 33,
+      "recall_dog": 0.6667
+    },
+    {
+      "training_condition": "full_training_data",
+      "dog_size": "medium",
+      "n_test": 37,
+      "recall_dog": 1.0
+    },
+    {
+      "training_condition": "full_training_data",
+      "dog_size": "large",
+      "n_test": 20,
+      "recall_dog": 1.0
+    }
+  ]
+}

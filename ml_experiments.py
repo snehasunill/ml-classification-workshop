@@ -74,22 +74,48 @@ def benchmark(train: pd.DataFrame, test: pd.DataFrame) -> dict:
     }
     X_train, y_train = train[FEATURES], train['pet']
     X_test, y_test = test[FEATURES], test['pet']
-    summary, fitted = {}, {}
+    
+    summary, fitted, cv_scores = {}, {}, {}
+    
+
+    # Step 1: Tune and compare models using training data only.
     for name, (estimator, grid) in candidates.items():
-        search = GridSearchCV(estimator, grid or {}, cv=cv,
-                              scoring=make_scorer(f1_score, pos_label='dog', zero_division=0),
-                              refit=True, n_jobs=1)
+        search = GridSearchCV(
+            estimator,
+            grid or {},
+            cv=cv,
+            scoring=make_scorer(
+                f1_score, pos_label='dog', zero_division=0
+            ),
+            refit=True,
+            n_jobs=1,
+        )
         search.fit(X_train, y_train)
-        pred = search.predict(X_test)
-        summary[name] = {'cv_f1_mean': round(float(search.best_score_), 4),
-                         'best_params': search.best_params_, 'test': metrics(y_test, pred)}
+        cv_scores[name] = float(search.best_score_)
+
+        summary[name] = {
+            'cv_f1_mean': round(float(search.best_score_), 4),
+            'best_params': search.best_params_,
+        }
         fitted[name] = search.best_estimator_
-    best_name = max(summary, key=lambda name: summary[name]['cv_f1_mean'])
+
+    # Step 2: Select the winner using cross-validation F1.
+    best_name = max(cv_scores, key=cv_scores.get)
+
+    # Step 3: Evaluate only the selected model on held-out data.
     best_pred = fitted[best_name].predict(X_test)
-    summary['_selection'] = {'selected_using_training_cv': best_name,
-                             'test_confusion_matrix_labels': ['cat', 'dog'],
-                             'test_confusion_matrix': confusion_matrix(y_test, best_pred, labels=['cat', 'dog']).tolist()}
+
+    summary['_selection'] = {
+        'selected_using_training_cv': best_name,
+        'test_metrics': metrics(y_test, best_pred),
+        'test_confusion_matrix_labels': ['cat', 'dog'],
+        'test_confusion_matrix': confusion_matrix(
+            y_test, best_pred, labels=['cat', 'dog']
+        ).tolist(),
+    }
+
     return summary
+
 
 
 def complexity_study(train: pd.DataFrame) -> list[dict]:
@@ -154,11 +180,15 @@ def main() -> None:
     (REPORTS / 'results.json').write_text(json.dumps(result, indent=2) + '\n')
     save_chart(result['complexity'])
     print('Model comparison (selection uses training-only 5-fold CV):')
+    
     for name, row in result['model_comparison'].items():
         if not name.startswith('_'):
-            print(f"{name:20s} CV F1={row['cv_f1_mean']:.3f}   held-out test F1={row['test']['f1_dog']:.3f}")
-    print('Selected:', result['model_comparison']['_selection']['selected_using_training_cv'])
-    print('Saved reports/results.json and reports/tree_complexity.png')
+            print(f"{name:20s} CV F1={row['cv_f1_mean']:.3f}")
+
+    selection = result['model_comparison']['_selection']
+    print('Selected:', selection['selected_using_training_cv'])
+    print('Selected model test metrics:', selection['test_metrics'])
+
 
 
 if __name__ == '__main__':

@@ -1,3 +1,4 @@
+
 {
   "dataset": {
     "synthetic": true,
@@ -12,39 +13,18 @@
   "model_comparison": {
     "dummy_majority": {
       "cv_f1_mean": 0.0,
-      "best_params": {},
-      "test": {
-        "accuracy": 0.5,
-        "balanced_accuracy": 0.5,
-        "precision_dog": 0.0,
-        "recall_dog": 0.0,
-        "f1_dog": 0.0
-      }
+      "best_params": {}
     },
     "logistic_regression": {
       "cv_f1_mean": 0.9348,
       "best_params": {
         "clf__C": 10
-      },
-      "test": {
-        "accuracy": 0.9333,
-        "balanced_accuracy": 0.9333,
-        "precision_dog": 1.0,
-        "recall_dog": 0.8667,
-        "f1_dog": 0.9286
       }
     },
     "knn": {
       "cv_f1_mean": 0.9386,
       "best_params": {
         "clf__n_neighbors": 11
-      },
-      "test": {
-        "accuracy": 0.9333,
-        "balanced_accuracy": 0.9333,
-        "precision_dog": 1.0,
-        "recall_dog": 0.8667,
-        "f1_dog": 0.9286
       }
     },
     "decision_tree": {
@@ -52,30 +32,24 @@
       "best_params": {
         "max_depth": 3,
         "min_samples_leaf": 1
-      },
-      "test": {
-        "accuracy": 0.9222,
-        "balanced_accuracy": 0.9222,
-        "precision_dog": 1.0,
-        "recall_dog": 0.8444,
-        "f1_dog": 0.9157
       }
     },
     "_selection": {
       "selected_using_training_cv": "knn",
+      "test_metrics": {
+        "accuracy": 0.9333,
+        "balanced_accuracy": 0.9333,
+        "precision_dog": 1.0,
+        "recall_dog": 0.8667,
+        "f1_dog": 0.9286
+      },
       "test_confusion_matrix_labels": [
         "cat",
         "dog"
       ],
       "test_confusion_matrix": [
-        [
-          90,
-          0
-        ],
-        [
-          12,
-          78
-        ]
+        [90, 0],
+        [12, 78]
       ]
     }
   },

@@ -40,7 +40,20 @@ With injected label noise in the separate complexity experiment, the unlimited-d
 On **33 held-out small dogs**, dog-class recall changes from **9.1%** (3/33) when small dogs are excluded from training to **66.7%** (22/33) when they are included. The evaluation group is identical for both conditions. Removing a subgroup also changes training-set size/class balance, so this is a *representation-gap demonstration*, not a controlled estimate of one isolated causal factor.
 
 ### Technical Interpretation & Discussion
-...
+Model selection:
+The k-NN classifier achieved the highest mean cross-validation F1 score, but the differences between models were small and don't establish statistical superiority.
+
+Feature scaling and leakage:
+k-NN uses distances, so numerical scale matters. Scaling inside a pipeline prevents preprocessing leakage across CV folds.
+
+Overfitting and generalization:
+More complex trees achieved higher training accuracy while eventually performing worse on validation data.
+
+Dataset representation:
+Missing small-dog examples reduced subgroup performance, although the experiment doesn't isolate causation.
+
+Limitations:
+Synthetic data illustrates ML fundamentals but does not establish real-world classification performance.
 
 ## Run locally
 

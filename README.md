@@ -140,15 +140,21 @@ python classification_demo.py
 ## Project structure
 
 ```text
+
 ml-classification-workshop/
-├── ml_experiments.py          # Portfolio-grade model comparison & diagnostics
-├── classification_demo.py     # Original simplified classroom demonstration
-├── tests/test_ml_experiments.py
+├── .github/
+│   └── workflows/
+│       └── ml-tests.yml
+├── ml_experiments.py
+├── classification_demo.py
+├── tests/
+│   └── test_ml_experiments.py
 ├── reports/
 │   ├── results.json
 │   └── tree_complexity.png
 ├── requirements.txt
 └── README.md
+
 ```
 
 ## Methodological decisions & limitations

@@ -87,7 +87,3 @@ ml-classification-workshop/
 ## Teaching application
 
 The companion classroom script reduces the concepts to three questions: *How does a model learn? When does it memorize? Who gets left out when training examples are missing?* It is intentionally simpler than the technical experiment. The unfinished team proposal is excluded from this repository.
-
-## Development note
-
-This prototype was developed with AI coding assistance. Before representing it as your own technical work on applications, review the code, reproduce the results, and be prepared to explain and independently modify the pipeline, CV setup, metrics, and experimental limitations. Adjust the attribution to accurately reflect your contribution.
